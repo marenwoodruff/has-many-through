@@ -1,59 +1,95 @@
 
-# Hobbies App
+# Many-to-many Books App
 
-## Objective
+## Objectives
 
-### Part 1
-
-- Create a full CRUD hobbies app with views in Express, and Node- using dummy seed data.  
-
-### Part 2
-
-- Add a postgres database and the sequelize CLI.
-- Update routes to accomodate this.
+- Create a full CRUD has-many-through Books app with views in Express, and Node- using a postgres database.  
+- Add in authentication.
 
 <br />
 
-## Part 1
+## Requirements
+
+- good indentation
+- dev branch (also on github)
+- at least **30 commits** with **good commit messages**
+- build out books + authors controllers
+- books + authors controllers are connected through authorBooks join table
+- links between pages
+- a navbar
+
+<br />
+
+## And so it begins...
 
 ### 1. Create ERDS for models
-hobbies
-   - name (string/varchar(255))
-   - description (string/varchar(255))
-   - difficulty (float/integer)
-   - levelOfProfficiency (float/integer)     
-   - hoursPracticed (float/integer)
+
+- A `user` has many `books`.
+- A `book` has many `authors` through `authorBooks`.
+- An `author` has many `books` through `authorBooks`.
+
+```
+user
+	- first_name (string)
+	- last_name (string)
+	- email (string)
+	- password (string)
+
+books
+   - title (string)
+   - description (string)
+   - genre (string)
+   - user_id (integer)
+
+authors
+	- name (string)
+	- country (string)
+
+authorBooks
+	- book_id (integer)
+	- author_id (integer)
+```
+
+<br />
+
+## Set up app
 
 ### 2. install dependencies/get app up and running
 
 ```
-express --view=ejs --git myApp
-cd myApp
+express --view=ejs --git myBooksApp
+cd myBooksApp
 npm install
 atom .
-npm install express-ejs-layouts
-npm install method-override
+
+npm install --save express-ejs-layouts
+npm install --save method-override
+npm install --save sequelize
+npm install --save pg pg-hstore
+npm install --save sequelize-cli
+sequelize init
 ```
 
-#### in app.js
+#### in the app.js
 
 ```
 var ejsLayouts = require('express-ejs-layouts');
 var methodOverride = require('method-override');
+
 app.use(ejsLayouts);
 app.use(methodOverride('_method'));
 ```
 
 #### update the title on the index controller
-- add `views/layout.ejs`, and DRY up the views/index.ejs
+- add a `views/layout.ejs`, and DRY up the views/index.ejs
 
-#### in layout.ejs
+#### in the layout.ejs
 
 ```
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Hobbies App</title>
+    <title>My Books App</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
@@ -68,21 +104,60 @@ app.use(methodOverride('_method'));
 </html>
 ```
 
-#### in package.json
-- add `"start:dev": "nodemon ./bin/www"`
+#### in the package.json
+- add `"start:dev": "nodemon ./bin/www"` to your scripts object
+
+
+#### update config/config.json- add in postgres
+
+```
+{
+  "development": {
+    "database": "books",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "database": "books_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "database": "books_production",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
+
+```
+
+#### create your postgres database, in a new tab
+
+```
+createdb books
+psql
+\l
+\c books
+\d
+\q
+```
 
 #### in another tab
 - start the server- npm run start:dev
 - go to localhost:3000 to make sure that you didn't break anything
 
-#### in first tab
+#### in the first tab
 - git init...
 - git commit
 
-### 3. set up hobbies_controller.js
-`touch routes/hobbies_controller.js`
+<br />
 
-#### in my_hobbies_controller.js
+## Books Controller
+
+### 3. set up books_controller.js
+`touch routes/books_controller.js`
+
+#### in the books_controller.js
 
 ```
 const express = require('express');
@@ -91,53 +166,20 @@ const router = express.Router();
 module.exports = router;
 ```
 
-#### in app.js
+#### in the app.js
 
 ```
-var hobbiesController = require('./routes/hobbies_controller');
-app.use('/hobbies', hobbiesController);
+var booksController = require('./routes/books_controller');
+
+...
+
+app.use('/books', booksController);
 ```
 
-```
-mkdir db
-touch db/hobbies_data.js
-```
-
-#### in db/hobbies_data.js
-
-##### set up seeds:
-
-```
-module.exports = {
-  seededHobbies: [
-    {
-      name: "playing guitar",
-      description: "6 stringed instrument- nylon vs steel strings, classical vs flamenco, acoustic vs electric",
-      difficulty: 3,
-      levelOfProfficiency: 3,
-      hoursPracticed: 5
-    }, 
-    {
-      name: "drawing",
-      description: "pencil to paper",
-      difficulty: 2,
-      levelOfProfficiency: 2,
-      hoursPracticed: 1
-    }
-  ]
-};
-```
-
-##### require the seeds file in your controller
-
-```
-var data = require('../db/hobbies_data').seededHobbies;
-```
-
-- chcek in postman/browser
+- check in postman/browser
 - git commit...
 
-### 4. set up index route
+### 4. set up the index route
 
 ```
 // index route
@@ -146,46 +188,239 @@ router.get('/', (req, res) => {
 });
 ```
 
-- chcek in postman/browser
+- check in postman/browser
 - git commit...
 
-### 5. add an index view
+<br />
+
+## Models
+
+### 5. create your models
+
+#### user model
+```
+sequelize model:create --name user -- attributes first_name:string,last_name:string,email:string,password:string
+```
+
+- check that your model looks correct in your migration
 
 ```
-mkdir views/hobbies
-touch views/hobbies/index.ejs
+sequelize db:migrate
 ```
 
-- add a dummy h1- `<h1>My Hobbies</h1>`
+- check your psql database/schemas
+- git commit...
 
-#### in hobbies_controller.js
+#### book model
+```
+sequelize model:create --name book -- attributes title:string,genre:string,description:text,user_id:integer
+```
+
+- check that your model looks correct in your migration
+
+```
+sequelize db:migrate
+```
+
+- check your psql database/schemas
+- git commit...
+
+#### author model
+```
+sequelize model:create --name author -- attributes name:string,country:string
+```
+
+- check that your model looks correct in your migration
+
+```
+sequelize db:migrate
+```
+
+- check your psql database/schemas
+- git commit...
+
+#### authorBook model
+```
+sequelize model:create --name authorBook -- attributes book_id:integer,author_id:integer
+```
+
+- check that your model looks correct in your migration
+
+```
+sequelize db:migrate
+```
+
+
+- check your psql database/schemas
+- git commit...
+
+
+### 6. add the books model to your Books controller
+`const Book = require('../models').book;`
+
+- git commit...
+
+<br />
+
+## Seeds
+
+### 7. add a user seeds file
+
+```
+mkdir db
+touch db/users_data.js
+```
+
+#### in db/users_data.js
+
+##### set up the seeds:
+
+```
+module.exports = {
+  [
+    {
+		first_name: "Schmitty",
+		last_name: "Schmitt",
+		email: "schmitty@gmail.com",
+		passwored: "123456"
+    }, 
+	{
+		first_name: "Mike",
+		last_name: "Dang",
+		email: "mikeyD@gmail.com",
+		passwored: "123456"
+    }
+  ]
+};
+```
+
+#### sequelize seed:generate
+
+```
+sequelize seed:generate --name userData
+```
+
+#### sequelize db:seed your seeds
+
+- add in a reference to your user data
+
+```
+var userData = require('../db/users_data');
+```
+
+- add the variable to your up function
+- git commit...
+
+
+
+### 8. add a book seeds file
+
+```
+touch db/books_data.js
+```
+
+#### in db/books_data.js
+
+##### set up the seeds:
+
+```
+module.exports = {
+  [
+    {
+      title: "The Eyre Affair: A Thursday Next Novel",
+      genre: "fiction",
+      description: "A literary detective pursues a master criminal through the world of Charlotte Bronte's Jane Eyre",
+      user_id: 1
+    }, 
+    {
+      title: "Bad Feminist: Essays",
+      genre: "non-fiction",
+      description: "Bad Feminist explores being a feminist while loving things that could seem at odds with feminist ideology",
+      user_id: 2
+    }
+  ]
+};
+```
+
+#### sequelize seed:generate
+
+```
+sequelize seed:generate --name booksData
+```
+
+#### sequelize db:seed your seeds
+
+- add in a reference to your book data
+
+```
+var bookData = require('../db/books_data');
+```
+
+- add the variable to your up function
+- git commit...
+
+
+## Index Route
+
+### 9. add an index view
+
+```
+mkdir views/books
+touch views/books/index.ejs
+```
+
+- add an h1- `<h1>my books</h1>`
+- check in postman/browser
+- git commit...
+
+
+
+### 10. update your index route
+
+#### in the books_controller.js
 
 ```
 // index route
 router.get('/', (req, res) => {
   // res.send('we did it');
-  res.render('hobbies/index');
+  
+  Book.findAll()
+    .then((books) => {
+      res.render('books/index', {
+        books
+      });
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
 ```
 
-#### in views/hobbies/index.ejs
+- check in postman/browser
+- git commit...
+
+
+### 11. update the index view
+
+#### in views/books/index.ejs
 
 ```
-<h1>My Hobbies</h1>
+...
 
-<% if (hobbies && hobbies.length) { %>
+<% if (books && books) { %>
   <ul>
-    <% hobbies.forEach((hobby) => { %>
+    <% books.forEach((book) => { %>
       <li class="margin-bottom">
-        <h2><a href="/hobbies/<%= id %>"><%= hobby.name %></a></h2>
+        <h2><a href="/books/<%= id %>"><%= book.name %></a></h2>
       </li>
     <% }); %>
 
-    <a class="btn btn-outline-info margin-top" href="/hobbies/new">Add a New Hobby</a>
+    <a class="btn btn-outline-info margin-top" href="/books/new">add a new book</a>
   </ul>
 <% } else { %>
-  <h3>You don't have any hobbies!</h3>
-  <a class="btn btn-outline-info margin-top" href="/hobbies/new">Add a New Hobby</a>
+  <h3>You don't have any books!</h3>
+  
+  <a class="btn btn-outline-info margin-top" href="/books/new">add a new book</a>
 <% } %> 
 ```
 
@@ -224,7 +459,11 @@ a {
 - check in postman/browser
 - git commit...
 
-### 6. add a show route
+<br />
+
+## Show Route
+
+### 12. add a show route
 
 ```
 // show route
@@ -236,47 +475,55 @@ router.get('/:id', (req, res) => {
 - check in postman/browser
 - git commit...
 
-### 7. add a show view
-`touch views/hobbies/show.ejs`
 
-#### in hobbies_controller.js
+### 13. add a show view
+`touch views/books/show.ejs`
+
+- add in `<h1><%= book.title %></h1>`
+- git commit...
+
+### 14. update the books_controller.js
 
 ```
 // show route
 router.get('/:id', (req, res) => {
   // res.send('we showed it');
-  var hobby = data[req.params.id];
   
-  res.render('hobbies/show', {
-    id: req.params.id,
-    hobby: hobby
-  });
+  Book.findById(req.params.id)
+    .then((book) => {
+      res.render('books/show', {
+         book
+      });
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
-```
-
-#### in show.ejs
-
-```
-<h1><%= hobby.name %></h1>
-<h3>description: <%= hobby.description %></h3>
-<br />
-
-<p>
-   <strong>difficulty:</strong> <%= hobby.difficulty %>, 
-   <strong>level of profficiency:</strong> <%= hobby.levelOfProfficiency %>
-</p>
-
-<p>
-   <strong>hours practiced:</strong> <%= hobby.hoursPracticed %>
-</p>
-
-<a class="btn btn-outline-info margin-top" href="/hobbies/<%= id %>/edit">edit hobby</a>
 ```
 
 - check in postman/browser
 - git commit...
 
-### 8. add a new route
+### 15. update the show.ejs
+
+```
+...
+
+<h3>genre: <%= book.genre %></h3>
+<h3>description: <%= book.description %></h3>
+<br />
+
+<a class="btn btn-outline-info margin-top" href="/books/<%= book.id %>/edit">edit book</a>
+```
+
+- check in postman/browser
+- git commit...
+
+<br />
+
+## New Route
+
+### 16. add a new route
 
 ```
 router.get('/new', (req, res) => {
@@ -287,71 +534,107 @@ router.get('/new', (req, res) => {
 - check in postman/browser
 - git commit...
 
-### 9. add a new view
-`touch views/hobbies/new.ejs`
 
-#### in new view
+### 17. add a new view
+`touch views/books/new.ejs`
+
+- add in `<h1>add a new book!</h1>`
+- git commit...
+
+
+### 18. update new route
 
 ```
-<h1>Add a New Hobby!</h1>
+// new route
+router.get('/new', (req, res) => {
+  // res.send('we knew it');
+
+  res.render('books/new')
+});
+```
+
+- check in postman/browser
+- git commit...
+
+
+### 19. update new view
+
+```
+...
 
 <form>
    <div class="form-group">
-      <label for="name">Hobby Name <span class="red">(required)</span></label>
-      <input class="form-control" type="text" id="name" required>
+      <label for="title">book title <span class="red">(required)</span></label>
+      <input class="form-control" type="text" id="title" name="title" required>
+   </div>
+   
+   <div class="form-group">
+      <label for="genre">genre</label>
+      <input class="form-control" type="text" id="genre" name="genre">
    </div>
 
    <div class="form-group">
-      <label for="description">Description</label>
-      <input class="form-control" type="text" id="description">
+      <label for="description">description</label>
+      <input class="form-control" type="text" id="description" name="description">
    </div>
 
    <div class="form-group">
-      <label for="difficulty">Difficulty</label>
-      <input class="form-control" type="number" id="difficulty" min="0" max="5" step="0.05">
-   </div>
-
-   <div class="form-group">
-      <label for="levelOfProfficiency">Level of Profficiency</label>
-      <input class="form-control" type="number" id="levelOfProfficiency" min="0" max="5" step="0.05">
-   </div>
-
-   <div class="form-group">
-      <label for="hoursPracticed">Hours Practiced</label>
-      <input class="form-control" type="number" id="hoursPracticed" step="0.05">
-   </div>
-
-   <div class="form-group">
-      <input class="btn btn-outline-info"" type="submit" value="Submit">
+      <input class="btn btn-outline-info"" type="submit" value="submit">
    </div>
 </form>
 
 
-<a class="btn btn-outline-info margin-top" href="/hobbies">back</a>
+<a class="btn btn-outline-info margin-top" href="/books">back</a>
+```
+
+#### update new route
+
+```
+// new route
+router.get('/new', (req, res) => {
+  // res.send('we knew it');
+
+  res.render('books/new', {
+    // building an instance of book
+    book: Book.build()
+  })
+  .catch((err) => {
+    res.status(400).render('error');
+  });
+});
 ```
 
 - check in postman/browser
 - git commit...
 
-### 10. add in a post route
+
+### 20. add in a post route
 
 ```
 // create route
 router.post('/', (req, res) => {
-  var newHobby = req.body;
-
-  data.seededHobbies.push(newHobby);
-  res.redirect('/hobbies');
+  // requires an object with properties that map to the properties of the object
+  Book.create(req.body)
+    .then((hobby) => {
+      res.redirect('/books');
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
 ```
 
 #### change the form action/method
-`<form action="/hobbies" method="POST">`
+`<form action="/books" method="POST">`
 
 - check in postman/browser
 - git commit...
 
-### 11. set up an edit route
+<br />
+
+## Edit Route
+
+### 21. set up an edit route
 
 ```
 // edit route
@@ -363,53 +646,56 @@ router.get('/:id/edit', (req, res) => {
 - check in postman/browser
 - git commit...
 
-### 12. set up an edit view
-`touch views/hobbies/edit.ejs`
 
-#### in controller
+### 22. set up an edit view
+`touch views/books/edit.ejs`
+
+- add in `<h1>Edit your '<%= book.title %>'</h1>`
+- git commit...
+
+
+#### 23. update edit route
 
 ```
 // edit route
 router.get('/:id/edit', (req, res) => {
   // res.send('we do it');
-  var hobbyToEdit = data[req.params.id];
-
-  res.render('hobbies/edit', {
-    id: req.params.id,
-    hobby: hobbyToEdit
-  });
+  Book.findById(req.params.id)
+    .then((book) => {
+      res.render('books/edit', {
+      	  id: req.params.id,
+         book
+      });
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
 ```
 
-#### in edit.ejs
+- check in postman/browser
+- git commit...
+
+
+### 24. update edit.ejs
 
 ```
-<h1>Edit your '<%= hobby.name %>' Hobby!</h1>
+...
 
-<form action="/hobbies/<%= id %>?_method=PUT" method="POST">
+<form action="/books/<%= book.id %>?_method=PUT" method="POST">
    <div class="form-group">
-      <label for="name">Hobby Name <span class="red">(required)</span></label>
-      <input class="form-control" type="text" name="name" value="<%= hobby.name %>">
+      <label for="title">Book Title <span class="red">(required)</span></label>
+      <input class="form-control" type="text" id="title" name="title" value="<%= book.title %>">
+   </div>
+   
+   <div class="form-group">
+      <label for="genre">Genre</label>
+      <input class="form-control" type="text" id="genre" name="genre" value="<%= book.genre %>">
    </div>
 
    <div class="form-group">
       <label for="description">Description</label>
-      <input class="form-control" type="text" name="description" value="<%= hobby.description %>">
-   </div>
-
-   <div class="form-group">
-      <label for="difficulty">Difficulty</label>
-      <input class="form-control" type="number" name="difficulty" value="<%= hobby.difficulty %>" min="0" max="5" step="0.05">
-   </div>
-
-   <div class="form-group">
-      <label for="levelOfProfficiency">Level of Profficiency</label>
-      <input class="form-control" type="number" name="levelOfProfficiency" value="<%= hobby.levelOfProfficiency %>" min="0" max="5" step="0.05">
-   </div>
-
-   <div class="form-group">
-      <label for="hoursPracticed">Hours Practices</label>
-      <input class="form-control" type="number" name="hoursPracticed" value="<%= hobby.hoursPracticed %> step="0.05">
+      <input class="form-control" type="text" id="description" name="description" value="<%= book.description %>">
    </div>
 
    <div class="form-group">
@@ -423,42 +709,58 @@ router.get('/:id/edit', (req, res) => {
 - check in postman/browser
 - git commit...
 
-### 13. add a PUT route
+
+### 25. add a PUT route
 
 ```
 // update route
 router.put('/:id', (req, res) => {
-  var editedHobby = req.body;
-  data[req.params.id] = editedHobby;
-
-  res.redirect('/hobbies/show', {
-     id: req.params.id,
-     hobby: editedHobby
-  });
+  Book.findById(req.params.id)
+    .then((book) => {
+      return book.update(req.body); // update method returns a promise
+    })
+    .then((updatedBook) => { // the book parameter is the updated hobby
+      res.render('books/show', {
+        hobby: updatedBook
+      });
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
 ```
 
 - check in postman/browser
 - git commit...
 
+<br />
+
+## Delete Route
+
 ### 14. add a delete route
 
 ```
 // delete route
 router.delete('/:id', (req, res) => {
-  // remove the item from the array
-  data.splice(req.params.id, 1); 
-
-  // redirect back to index route
-  res.redirect('/hobbies'); 
+  Book.findById(req.params.id)
+    .then((book) => {
+      return book.destroy(); // destroy method is an asynchronous call that returns a promise
+    })
+    .then(() => {
+      // redirect back to index route
+      res.redirect('/books');
+    })
+    .catch((err) => {
+      res.status(400).render('error');
+    });
 });
 ```
 
 #### on the show page
 
 ```
-<form action="/hobbies/<%= id %>?_method=DELETE" method="POST">
-  <input class="btn btn-outline-danger sm-margin-top" type="submit" value="Delete Hobby" />
+<form action="/books/<%= book.id %>?_method=DELETE" method="POST">
+  <input class="btn btn-outline-danger sm-margin-top" type="submit" value="delete this book" />
 </form>
 ```
 
@@ -469,334 +771,23 @@ router.delete('/:id', (req, res) => {
 
 ---
 
-# Part 2: Add Sequelize
-
-### 1. install sequelize
-
-```
-npm install --save sequelize
-npm install --save pg pg-hstore
-npm install --save sequelize-cli
-sequelize init
-```
-
-### This will add these folders
-- config
-   - config.json
-- models
-- index.js
-- seeders
-- migrations
-
-#### update config/config.json- add in postgres
-
-```
-{
-  "development": {
-    "database": "hobbies",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "test": {
-    "database": "hobbies_test",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "production": {
-    "database": "hobbies_production",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  }
-}
-
-```
-
-#### create your postgres database, in a new tab
-
-```
-createdb hobbies
-psql
-\l
-\c hobbies
-\d
-\q
-```
-
-- git commit...
-
-### 2. create a new controller for sequelize (only so that we can compare the two
-
-```
-touch routes/hobbies_controller_sequelize.js
-```
-
-#### in app.js
-
-```
-// var hobbiesController = require('./routes/hobbies_controller');
-var hobbiesController = require('./routes/hobbies_controller_sequelize');
-```
-
-- git commit...
-
-### 3. create your hobby model
-
-```
-sequelize model:create --name hobby -- attributes name:string,description:string,difficulty:float,levelOfProfficiency:float,hoursPracticed:float
-
-sequelize db:migrate
-```
-
-- git commit...
-
-### 4. add the model to your controller
-`const Hobby = require('../models').hobby;`
-
-- git commit...
-
-### 5. update the index route
-
-```
-// index route
-router.get('/', (req, res) => {
-  // res.send('we did it');
-
-  Hobby.findAll()
-    .then((hobbies) => {
-      res.render('hobbies/index', {
-        hobbies: hobbies
-      });
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-#### in index.ejs
-
-```
-...
-<h2><a href="/hobbies/<%= hobby.id %>"><%= hobby.name %></a></h2>
-...
-```
-
-- check in postman/browser
-- git commit...
-
-### 6. update the show route
-
-```
-// show route
-router.get('/:id', (req, res) => {
-  // res.send('we showed it');
-  Hobby.findById(req.params.id)
-    .then((hobby) => {
-      res.render('hobbies/show', {
-        hobby: hobby
-      });
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-- check in postman/browser
-- git commit...
-
-#### in show.ejs
-
-```
-...
-
-<a class="btn btn-outline-info margin-top" href="/hobbies/<%= hobby.id %>/edit">edit hobby</a>
-
-<form action="/hobbies/<%= hobby.id %>?_method=DELETE" method="POST">
-  <input class="btn btn-outline-danger sm-margin-top" type="submit" value="delete hobby" />
-</form>
-```
-
-- check in postman/browser
-- git commit...
-
-### 7. update the new route
-
-```
-// new route
-router.get('/new', (req, res) => {
-  // res.send('we knew it');
-
-  res.render('hobbies/new', {
-    // building an instance of hobby
-    hobby: Hobby.build()
-  })
-  .catch((err) => {
-    res.status(400).render('error');
-  });
-});
-```
-
-- check in postman/browser
-- git commit...
-
-### 8. update the post route
-
-```
-// create route
-router.post('/', (req, res) => {
-  // requires an object with properties that map to the properties of the object
-  Hobby.create(req.body)
-    .then((hobby) => {
-      res.redirect('/hobbies');
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-- check in postman/browser
-- git commit...
-
-### 9. update the edit route
-
-```
-// edit route
-router.get('/:id/edit', (req, res) => {
-  // res.send('we do it');
-  Hobby.findById(req.params.id)
-    .then((hobby) => {
-      res.render('hobbies/edit', {
-        hobby: hobby
-      });
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-#### in edit.ejs
-
-```
-<form method="POST" action="/hobbies/<%= hobby.id %>?_method=PUT">
-   ...
-
-<a class="btn btn-outline-info margin-top" href="/hobbies/<%= hobby.id %>">back</a>
-```
-
-- check in postman/browser
-- git commit...
-
-### 9. update the put route
-
-```
-// update route
-router.put('/:id', (req, res) => {
-  Hobby.findById(req.params.id)
-    .then((hobby) => {
-      return hobby.update(req.body); // update method returns a promise
-    })
-    .then((updatedHobby) => { // the hobby parameter is the updated hobby
-      res.render('hobbies/show', {
-        hobby: updatedHobby
-      });
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-- check in postman/browser
-- git commit...
-
-### 10. update the delete route
-
-```
-// delete route
-router.delete('/:id', (req, res) => {
-  Hobby.findById(req.params.id)
-    .then((hobby) => {
-      return hobby.destroy(); // destroy method is an asynchronous call that returns a promise
-    })
-    .then(() => {
-      // redirect back to index route
-      res.redirect('/hobbies');
-    })
-    .catch((err) => {
-      res.status(400).render('error');
-    });
-});
-```
-
-- check in postman/browser
-- git commit...
-
-### 11. add a seeds file 
-
-```
-sequelize seed:create --name my-seed-file
-```
-
-```
-'use strict';
-
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkInsert('Person', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
-
-    return queryInterface.bulkInsert('hobbies', [{
-        name: 'playing guitar',
-        description: "6 stringed instrument- nylon vs steel strings, classical vs flamenco, acoustic vs electric",
-        difficulty: 3,
-        levelOfProfficiency: 3,
-        hoursPracticed: 5
-      }, 
-      {
-        name: "drawing",
-        description: "pencil to paper",
-        difficulty: 2,
-        levelOfProfficiency: 2,
-        hoursPracticed: 1
-      }
-    ], {});
-  },
-
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('Person', null, {});
-    */
-    return queryInterface.bulkDelete('hobbies', null, {});
-  }
-};
-```
-
-### 12. sequelize db:migrate 
-
-```
-sequelize db:seed:all
-sequelize db:migrate
-```
-
-- check in postman/browser
-
-<br />
-
 # CONGRATS!!!
 
 ![high five](https://media.giphy.com/media/OcZp0maz6ALok/giphy.gif)
+
+---
+
+<br />
+
+# Next Steps
+
+- Add in your authors controllers
+- Connect your books + authors controllers
+- Add in your authors views
+
+# Bonus
+
+- Work on authentication with bcrypt
+- connect your books + users controllers
+- build out your users controller + views
+
