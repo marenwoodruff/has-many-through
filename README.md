@@ -8,53 +8,75 @@
 
 <br />
 
-## Requirements
+## Requirements (each of these are part of the rubric
 
+- fork + clone this repo
+- create a pull request immediately
 - good indentation
-- dev branch (also on github)
-- at least **30 commits** with **good commit messages**
-- build out books + authors controllers
-- books + authors controllers are connected through authorBooks join table
-- links between pages
-- a navbar
+- have at least **30 commits** with **good commit messages**
+- up to date dev branch (also pushed to github)
+	- you can add other branches off of dev 
+- build out the books (we will start books together) + authors controllers (bonus to add in users + authentication- **challenge yourself!!!**)
+- build out all models
+- work with PostgreSQL database via sequelize
+- build out books + user seeds files
+- connect the books + authors controllers through the authorBooks join table
+- add links between pages
+- add a navbar (in a partial)
+- add a footer (in a partial) that is at least as tall as the window, even if there isn't that much content
+- create a welcome page
+
+#### suggestions
+
+- make sure that you have saved everything to your package.json
+- make sure that you have required packages and your controllers correctly
+- make sure that your views are in the correct folder
+- make sure that you have a layout.ejs view that is set up correctly
+- make it pretty
+- create a well-organized readme
+- create a github project with user stories
 
 <br />
 
 ## And so it begins...
 
-### 1. Create ERDS for models
+### 1. Create the ERDS
 
-- A `user` has many `books`.
-- A `book` has many `authors` through `authorBooks`.
-- An `author` has many `books` through `authorBooks`.
+- A `user` has many `books`
+- A `book` has many `authors` through `authorBooks`
+- An `author` has many `books` through `authorBooks`
 
 ```
 user
+	- id (integer)
 	- first_name (string)
 	- last_name (string)
 	- email (string)
 	- password (string)
 
 books
-   - title (string)
-   - description (string)
-   - genre (string)
-   - user_id (integer)
+	- id (integer)
+	- title (string)
+	- description (string)
+	- genre (string)
+	- user_id (integer)
 
 authors
+	- id (integer)
 	- name (string)
 	- country (string)
 
 authorBooks
+	- id (integer)
 	- book_id (integer)
 	- author_id (integer)
 ```
 
 <br />
 
-## Set up app
+## Set up the app
 
-### 2. install dependencies/get app up and running
+### 2. install dependencies/get the app up and running
 
 ```
 express --view=ejs --git myBooksApp
@@ -69,6 +91,12 @@ npm install --save pg pg-hstore
 npm install --save sequelize-cli
 sequelize init
 ```
+
+- git init
+- git status
+- git add
+- git commit
+- git push
 
 #### in the app.js
 
@@ -142,12 +170,18 @@ psql
 \q
 ```
 
+#### update the index controller 
+```
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'The Books App' });
+});
+```
+
 #### in another tab
 - start the server- npm run start:dev
 - go to localhost:3000 to make sure that you didn't break anything
 
 #### in the first tab
-- git init...
 - git commit
 
 <br />
@@ -199,7 +233,7 @@ router.get('/', (req, res) => {
 
 #### user model
 ```
-sequelize model:create --name user -- attributes first_name:string,last_name:string,email:string,password:string
+sequelize model:create --name user --attributes firstName:string,lastName:string,email:string,password:string
 ```
 
 - check that your model looks correct in your migration
@@ -213,7 +247,7 @@ sequelize db:migrate
 
 #### book model
 ```
-sequelize model:create --name book -- attributes title:string,genre:string,description:text,user_id:integer
+sequelize model:create --name book --attributes title:string,genre:string,description:text,userId:integer
 ```
 
 - check that your model looks correct in your migration
@@ -227,7 +261,7 @@ sequelize db:migrate
 
 #### author model
 ```
-sequelize model:create --name author -- attributes name:string,country:string
+sequelize model:create --name author --attributes name:string,country:string
 ```
 
 - check that your model looks correct in your migration
@@ -241,7 +275,7 @@ sequelize db:migrate
 
 #### authorBook model
 ```
-sequelize model:create --name authorBook -- attributes book_id:integer,author_id:integer
+sequelize model:create --name authorBook --attributes bookId:integer,authorId:integer
 ```
 
 - check that your model looks correct in your migration
@@ -279,16 +313,16 @@ touch db/users_data.js
 module.exports = {
   [
     {
-		first_name: "Schmitty",
-		last_name: "Schmitt",
-		email: "schmitty@gmail.com",
-		passwored: "123456"
-    }, 
-	{
-		first_name: "Mike",
-		last_name: "Dang",
-		email: "mikeyD@gmail.com",
-		passwored: "123456"
+      first_name: "Schmitty",
+      last_name: "Schmitt",
+      email: "schmitty@gmail.com",
+      passwored: "123456"
+    },
+    {
+      first_name: "Mike",
+      last_name: "Dang",
+      email: "mikeyD@gmail.com",
+      passwored: "123456"
     }
   ]
 };
@@ -297,7 +331,7 @@ module.exports = {
 #### sequelize seed:generate
 
 ```
-sequelize seed:generate --name userData
+sequelize seed:generate --name user-data
 ```
 
 #### sequelize db:seed your seeds
@@ -308,7 +342,7 @@ sequelize seed:generate --name userData
 var userData = require('../db/users_data');
 ```
 
-- add the variable to your up function
+- add the variable to your up/down functions
 - git commit...
 
 
