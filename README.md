@@ -343,6 +343,7 @@ var userData = require('../db/users_data');
 ```
 
 - add the variable to your up/down functions
+- sequelize db:seed:all
 - git commit...
 
 
@@ -391,6 +392,7 @@ var bookData = require('../db/books_data');
 ```
 
 - add the variable to your up function
+- sequelize db:seed:all
 - git commit...
 
 
