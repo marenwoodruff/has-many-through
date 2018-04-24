@@ -379,7 +379,7 @@ module.exports = {
 #### sequelize seed:generate
 
 ```
-sequelize seed:generate --name booksData
+sequelize seed:generate --name books-data
 ```
 
 #### sequelize db:seed your seeds
