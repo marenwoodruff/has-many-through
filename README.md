@@ -97,6 +97,7 @@ sequelize init
 - git add
 - git commit
 - git push
+- git checkout -b dev
 
 #### in the app.js
 
@@ -183,6 +184,9 @@ router.get('/', function(req, res, next) {
 
 #### in the first tab
 - git commit
+- git merge...
+
+
 
 <br />
 
@@ -212,6 +216,9 @@ app.use('/books', booksController);
 
 - check in postman/browser
 - git commit...
+- git merge...
+
+
 
 ### 4. set up the index route
 
@@ -224,6 +231,9 @@ router.get('/', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- git merge...
+
+
 
 <br />
 
@@ -244,6 +254,9 @@ sequelize db:migrate
 
 - check your psql database/schemas
 - git commit...
+- git merge...
+
+
 
 #### book model
 ```
@@ -258,6 +271,9 @@ sequelize db:migrate
 
 - check your psql database/schemas
 - git commit...
+- git merge...
+
+
 
 #### author model
 ```
@@ -272,6 +288,9 @@ sequelize db:migrate
 
 - check your psql database/schemas
 - git commit...
+- git merge...
+
+
 
 #### authorBook model
 ```
@@ -287,18 +306,42 @@ sequelize db:migrate
 
 - check your psql database/schemas
 - git commit...
+- git merge...
 
 
-### 6. add the books model to your Books controller
+
+### 6. add in relations between user + book
+
+#### in models/user.js, in the associate function
+
+```
+user.hasMany(models.book, {as : 'book', foreignKey : 'userId'});
+```
+
+#### in models/book.js, in the associate function
+
+```
+book.belongsTo(models.user, {foreignKey : 'userId'});
+```
+
+- git commit...
+- git merge...
+
+
+
+### 7. add the books model to your Books controller
 `const Book = require('../models').book;`
 
 - git commit...
+- git merge...
+
+
 
 <br />
 
 ## Seeds
 
-### 7. add a user seeds file
+### 8. add a user seeds file
 
 ```
 mkdir db
@@ -310,22 +353,24 @@ touch db/users_data.js
 ##### set up the seeds:
 
 ```
-module.exports = {
-  [
-    {
-      first_name: "Schmitty",
-      last_name: "Schmitt",
-      email: "schmitty@gmail.com",
-      passwored: "123456"
-    },
-    {
-      first_name: "Mike",
-      last_name: "Dang",
-      email: "mikeyD@gmail.com",
-      passwored: "123456"
-    }
-  ]
-};
+module.exports = [
+  {
+    firstName: "Schmitty",
+    lastName: "Schmitt",
+    email: "schmitty@gmail.com",
+    password: "123456",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    firstName: "Mike",
+    lastName: "Dang",
+    email: "mikeyD@gmail.com",
+    password: "123456",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
 ```
 
 #### sequelize seed:generate
@@ -345,10 +390,11 @@ var userData = require('../db/users_data');
 - add the variable to your up/down functions
 - sequelize db:seed:all
 - git commit...
+- git merge...
 
 
 
-### 8. add a book seeds file
+### 9. add a book seeds file
 
 ```
 touch db/books_data.js
@@ -359,22 +405,24 @@ touch db/books_data.js
 ##### set up the seeds:
 
 ```
-module.exports = {
-  [
-    {
-      title: "The Eyre Affair: A Thursday Next Novel",
-      genre: "fiction",
-      description: "A literary detective pursues a master criminal through the world of Charlotte Bronte's Jane Eyre",
-      user_id: 1
-    }, 
-    {
-      title: "Bad Feminist: Essays",
-      genre: "non-fiction",
-      description: "Bad Feminist explores being a feminist while loving things that could seem at odds with feminist ideology",
-      user_id: 2
-    }
-  ]
-};
+module.exports = [
+  {
+    title: "The Eyre Affair: A Thursday Next Novel",
+    genre: "fiction",
+    description: "A literary detective pursues a master criminal through the world of Charlotte Bronte's Jane Eyre",
+    userId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    title: "Bad Feminist: Essays",
+    genre: "non-fiction",
+    description: "Bad Feminist explores being a feminist while loving things that could seem at odds with feminist ideology",
+    userId: 2,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
 ```
 
 #### sequelize seed:generate
@@ -394,11 +442,13 @@ var bookData = require('../db/books_data');
 - add the variable to your up function
 - sequelize db:seed:all
 - git commit...
+- git merge...
+
 
 
 ## Index Route
 
-### 9. add an index view
+### 10. add an index view
 
 ```
 mkdir views/books
@@ -406,12 +456,23 @@ touch views/books/index.ejs
 ```
 
 - add an h1- `<h1>my books</h1>`
+
+#### update the controller
+```
+// index route
+router.get('/', (req, res) => {
+  // res.send('we did it');
+  res.render('books/index');
+});
+```
+
 - check in postman/browser
 - git commit...
+- git merge...
 
 
 
-### 10. update your index route
+### 11. update the index route
 
 #### in the books_controller.js
 
@@ -434,9 +495,11 @@ router.get('/', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- git merge...
 
 
-### 11. update the index view
+
+### 12. update the index view
 
 #### in views/books/index.ejs
 
@@ -447,7 +510,7 @@ router.get('/', (req, res) => {
   <ul>
     <% books.forEach((book) => { %>
       <li class="margin-bottom">
-        <h2><a href="/books/<%= id %>"><%= book.name %></a></h2>
+        <h2><a href="/books/<%= book.id %>"><%= book.title %></a></h2>
       </li>
     <% }); %>
 
@@ -494,12 +557,15 @@ a {
 
 - check in postman/browser
 - git commit...
+- git merge...
+
+
 
 <br />
 
 ## Show Route
 
-### 12. add a show route
+### 13. add a show route
 
 ```
 // show route
@@ -510,15 +576,20 @@ router.get('/:id', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- git merge...
 
 
-### 13. add a show view
+
+### 14. add a show view
 `touch views/books/show.ejs`
 
 - add in `<h1><%= book.title %></h1>`
 - git commit...
+- git merge...
 
-### 14. update the books_controller.js
+
+
+### 15. update the books_controller.js
 
 ```
 // show route
@@ -539,8 +610,11 @@ router.get('/:id', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- git merge...
 
-### 15. update the show.ejs
+
+
+### 16. update the show.ejs
 
 ```
 ...
@@ -549,19 +623,28 @@ router.get('/:id', (req, res) => {
 <h3>description: <%= book.description %></h3>
 <br />
 
-<a class="btn btn-outline-info margin-top" href="/books/<%= book.id %>/edit">edit book</a>
+<div>
+  <a class="btn btn-outline-info margin-top" href="/books/<%= book.id %>/edit">edit book</a>
+</div>
+
+<div>
+  <a class="btn btn-outline-info margin-top" href="/books">back</a>
+</div>
 ```
 
 - check in postman/browser
 - git commit...
+- get merge...
+
 
 <br />
 
 ## New Route
 
-### 16. add a new route
+### 17. add a new route
 
 ```
+// new route
 router.get('/new', (req, res) => {
   res.send('we knew it');
 });
@@ -569,16 +652,21 @@ router.get('/new', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 17. add a new view
+
+### 18. add a new view
 `touch views/books/new.ejs`
 
 - add in `<h1>add a new book!</h1>`
+
 - git commit...
+- get merge...
 
 
-### 18. update new route
+
+### 19. update new route
 
 ```
 // new route
@@ -591,9 +679,11 @@ router.get('/new', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 19. update new view
+
+### 20. update new view
 
 ```
 ...
@@ -615,7 +705,7 @@ router.get('/new', (req, res) => {
    </div>
 
    <div class="form-group">
-      <input class="btn btn-outline-info"" type="submit" value="submit">
+      <input class="btn btn-outline-info" type="submit" value="submit">
    </div>
 </form>
 
@@ -642,9 +732,11 @@ router.get('/new', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 20. add in a post route
+
+### 21. add in a post route
 
 ```
 // create route
@@ -665,32 +757,39 @@ router.post('/', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
+
+
 
 <br />
 
 ## Edit Route
 
-### 21. set up an edit route
+### 22. set up an edit route
 
 ```
 // edit route
 router.get('/:id/edit', (req, res) => {
-  res.send('we do it');
+  res.send('we edit it');
 });
 ```
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 22. set up an edit view
+
+### 23. set up an edit view
 `touch views/books/edit.ejs`
 
 - add in `<h1>Edit your '<%= book.title %>'</h1>`
 - git commit...
+- get merge...
 
 
-#### 23. update edit route
+
+#### 24. update edit route
 
 ```
 // edit route
@@ -711,9 +810,11 @@ router.get('/:id/edit', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 24. update edit.ejs
+
+### 25. update edit.ejs
 
 ```
 ...
@@ -723,7 +824,7 @@ router.get('/:id/edit', (req, res) => {
       <label for="title">Book Title <span class="red">(required)</span></label>
       <input class="form-control" type="text" id="title" name="title" value="<%= book.title %>">
    </div>
-   
+
    <div class="form-group">
       <label for="genre">Genre</label>
       <input class="form-control" type="text" id="genre" name="genre" value="<%= book.genre %>">
@@ -735,18 +836,20 @@ router.get('/:id/edit', (req, res) => {
    </div>
 
    <div class="form-group">
-      <input class="btn btn-outline-info margin-top" type="submit" value="Submit">
+      <input class="btn btn-outline-info margin-top" type="submit" value="submit">
    </div>
 </form>
 
-<a class="btn btn-outline-info margin-top" href="/hobbies/<%= id %>">back</a>
+<a class="btn btn-outline-info margin-top" href="/books/<%= book.id %>">back</a>
 ```
 
 - check in postman/browser
 - git commit...
+- get merge...
 
 
-### 25. add a PUT route
+
+### 26. add a PUT route
 
 ```
 // update route
@@ -755,9 +858,9 @@ router.put('/:id', (req, res) => {
     .then((book) => {
       return book.update(req.body); // update method returns a promise
     })
-    .then((updatedBook) => { // the book parameter is the updated hobby
+    .then((updatedBook) => { // the book parameter is the updated book
       res.render('books/show', {
-        hobby: updatedBook
+        book: updatedBook
       });
     })
     .catch((err) => {
@@ -768,12 +871,15 @@ router.put('/:id', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
+
+
 
 <br />
 
 ## Delete Route
 
-### 14. add a delete route
+### 27. add a delete route
 
 ```
 // delete route
@@ -802,6 +908,9 @@ router.delete('/:id', (req, res) => {
 
 - check in postman/browser
 - git commit...
+- get merge...
+
+
 
 <br />
 
@@ -818,12 +927,13 @@ router.delete('/:id', (req, res) => {
 # Next Steps
 
 - Add in your authors controllers
-- Connect your books + authors controllers
+- Connect your books + authors controllers (in the controller + models)
 - Add in your authors views
 
 # Bonus
 
 - Work on authentication with bcrypt
 - connect your books + users controllers
-- build out your users controller + views
+- build out your users controller
+- build out your user views
 
