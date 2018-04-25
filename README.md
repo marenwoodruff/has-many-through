@@ -105,6 +105,8 @@ sequelize init
 var ejsLayouts = require('express-ejs-layouts');
 var methodOverride = require('method-override');
 
+...
+
 app.use(ejsLayouts);
 app.use(methodOverride('_method'));
 ```
