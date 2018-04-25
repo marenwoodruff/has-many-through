@@ -22,6 +22,7 @@
 - build out the book + user seeds files
 - connect the books + authors controllers through the authorBooks join table
 - add working links between pages
+- add validations
 - add a navbar (in a partial) with links
 - add a footer (in a partial) that is at least as tall as the window, even if there isn't that much content on the page
 - create a welcome page
@@ -37,6 +38,7 @@
 - make sure that your links work
 - make sure that your forms work, and your data is saved to the database
 - make sure that both dev + master are up to date
+- add validations
 - make it pretty
   - create a log
   - add animations on your welcome page
