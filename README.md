@@ -1,5 +1,5 @@
 
-# Many-to-many Books App
+# Books App (many-to-many)
 
 ## Objectives
 
@@ -927,7 +927,7 @@ router.delete('/:id', (req, res) => {
 
 <br />
 
-# Next Steps (You do)
+# Next Steps (You Do)
 
 - Add in your authors controllers
 - Connect your books + authors controllers (in the controller + models)
