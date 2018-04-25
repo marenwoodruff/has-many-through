@@ -8,7 +8,7 @@
 
 <br />
 
-## Requirements (each of these are part of the rubric
+## Requirements (each of these are part of the rubric)
 
 - fork + clone this repo
 - create a pull request immediately
@@ -26,7 +26,7 @@
 - add a footer (in a partial) that is at least as tall as the window, even if there isn't that much content
 - create a welcome page
 
-#### suggestions
+### suggestions
 
 - make sure that you have saved everything to your package.json
 - make sure that you have required packages and your controllers correctly
