@@ -3,7 +3,7 @@
 
 ## Objectives
 
-- Create a full CRUD has-many-through Books app (books-to-authors) with views in Express, and Node- using a postgres database and sequelize ORM.  
+- Create a full CRUD many-to-many Books app (books-to-authors) with views in Express, and Node- using a postgres database and sequelize ORM.  
 - Add in authentication.
 
 <br />
