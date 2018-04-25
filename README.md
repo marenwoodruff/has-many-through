@@ -50,8 +50,8 @@
 ```
 user
   - id (integer)
-  - first_name (string)
-  - last_name (string)
+  - firstName (string)
+  - lastName (string)
   - email (string)
   - password (string)
 
@@ -60,7 +60,7 @@ books
   - title (string)
   - description (string)
   - genre (string)
-  - user_id (integer)
+  - userId (integer)
 
 authors
   - id (integer)
@@ -69,8 +69,8 @@ authors
 
 authorBooks
   - id (integer)
-  - book_id (integer)
-  - author_id (integer)
+  - bookId (integer)
+  - authorId (integer)
 ```
 
 <br />
