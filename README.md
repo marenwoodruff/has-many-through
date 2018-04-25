@@ -38,6 +38,8 @@
 - make sure that your forms work, and your data is saved to the database
 - make sure that both dev + master are up to date
 - make it pretty
+  - create a log
+  - add animations on your welcome page
 - create a well-organized readme
 - create a github project with user stories
 
