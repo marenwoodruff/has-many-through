@@ -49,28 +49,28 @@
 
 ```
 user
-	- id (integer)
-	- first_name (string)
-	- last_name (string)
-	- email (string)
-	- password (string)
+  - id (integer)
+  - first_name (string)
+  - last_name (string)
+  - email (string)
+  - password (string)
 
 books
-	- id (integer)
-	- title (string)
-	- description (string)
-	- genre (string)
-	- user_id (integer)
+  - id (integer)
+  - title (string)
+  - description (string)
+  - genre (string)
+  - user_id (integer)
 
 authors
-	- id (integer)
-	- name (string)
-	- country (string)
+  - id (integer)
+  - name (string)
+  - country (string)
 
 authorBooks
-	- id (integer)
-	- book_id (integer)
-	- author_id (integer)
+  - id (integer)
+  - book_id (integer)
+  - author_id (integer)
 ```
 
 <br />
