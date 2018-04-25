@@ -3,7 +3,7 @@
 
 ## Objectives
 
-- Create a full CRUD has-many-through Books app with views in Express, and Node- using a postgres database.  
+- Create a full CRUD has-many-through Books app (books-to-authors) with views in Express, and Node- using a postgres database and sequelize ORM.  
 - Add in authentication.
 
 <br />
@@ -929,15 +929,15 @@ router.delete('/:id', (req, res) => {
 
 # Next Steps (You Do)
 
-- Add in your authors controller
-- Connect your books + authors controllers (in the controllers + models)
-- Add in your authors views
+- add in your authors controller
+- connect your books + authors controllers (in the controllers + models)
+- add in your authors views
 
 <br />
 
 # Bonus
 
-- Work on authentication with bcrypt
+- work on authentication with bcrypt
 - connect your books + users controllers
 - build out your users controller
 - build out your user views
