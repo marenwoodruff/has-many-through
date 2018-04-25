@@ -929,8 +929,8 @@ router.delete('/:id', (req, res) => {
 
 # Next Steps (You Do)
 
-- Add in your authors controllers
-- Connect your books + authors controllers (in the controller + models)
+- Add in your authors controller
+- Connect your books + authors controllers (in the controllers + models)
 - Add in your authors views
 
 <br />
