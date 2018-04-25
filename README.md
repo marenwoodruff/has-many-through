@@ -8,26 +8,27 @@
 
 <br />
 
-## Requirements (each of these are part of the rubric)
+## Requirements (in order to get a 100 on the lab, you must have all of these)
 
 - fork + clone this repo
-- create a pull request immediately
-- good indentation
+- create a pull request **immediately**
+- have good indentation
 - have at least **30 commits** with **good commit messages**
 - up to date dev branch (also pushed to github)
 	- you can add other branches off of dev 
-- build out the books (we will start books together) + authors controllers (bonus to add in users + authentication- **challenge yourself!!!**)
-- build out all models
-- work with PostgreSQL database via sequelize
-- build out books + user seeds files
+- build out the books controller (we will start books together) + authors controllers (bonus to add in users + authentication- **challenge yourself!!!**)
+- build out all of your models + their relationships
+- work with your PostgreSQL database via sequelize
+- build out the book + user seeds files
 - connect the books + authors controllers through the authorBooks join table
-- add links between pages
-- add a navbar (in a partial)
-- add a footer (in a partial) that is at least as tall as the window, even if there isn't that much content
+- add working links between pages
+- add a navbar (in a partial) with links
+- add a footer (in a partial) that is at least as tall as the window, even if there isn't that much content on the page
 - create a welcome page
 
-### suggestions
+## best practices checklist
 
+- have good indentation
 - make sure that you have saved everything to your package.json
 - make sure that you have required packages and your controllers correctly
 - make sure that your views are in the correct folder
