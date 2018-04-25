@@ -29,10 +29,14 @@
 ## best practices checklist
 
 - have good indentation
+- make sure that you don't get any errors when you run `npm run start:dev`
 - make sure that you have saved everything to your package.json
 - make sure that you have required packages and your controllers correctly
 - make sure that your views are in the correct folder
 - make sure that you have a layout.ejs view that is set up correctly
+- make sure that your links work
+- make sure that your forms work, and your data is saved to the database
+- make sure that both dev + master are up to date
 - make it pretty
 - create a well-organized readme
 - create a github project with user stories
