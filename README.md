@@ -933,10 +933,11 @@ router.delete('/:id', (req, res) => {
 - Connect your books + authors controllers (in the controller + models)
 - Add in your authors views
 
+<br />
+
 # Bonus
 
 - Work on authentication with bcrypt
 - connect your books + users controllers
 - build out your users controller
 - build out your user views
-
