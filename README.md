@@ -178,6 +178,13 @@ psql
 \q
 ```
 
+#### update your error page
+```
+<h1>404: File not Found</h1>
+
+<img src="http://i.giphy.com/66H4XkI1OWAOA.gif" alt="Barney Stinson says: Noooo">
+```
+
 #### update the index controller 
 ```
 router.get('/', function(req, res, next) {
